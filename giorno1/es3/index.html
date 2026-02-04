@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>ilmiosito</title>
+
     <style>
         html, body {
             margin: 0;
@@ -20,7 +21,6 @@
             transition: background-color 0.6s ease;
             z-index: 1;
         }
-        
 
         /* CANVAS BACKGROUND */
         #codeCanvas {
@@ -33,18 +33,20 @@
             z-index: 0;
         }
 
-        /* TOP */
+        /* BOTTOM RIGHT BLOCK */
         .top {
             display: flex;
             justify-content: flex-end;
             gap: 60px;
-            padding-top: 25px;
+            padding-bottom: 25px;
             padding-right: 60px;
             font-weight: bold;
             font-size: 18px;
             letter-spacing: 1px;
             z-index: 1;
-            position: relative;
+            position: absolute;
+            bottom: 0;
+            right: 0;
         }
 
         .top div {
@@ -60,68 +62,69 @@
         .container {
             height: calc(100% - 140px);
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
+            padding-left: 60px;
             z-index: 1;
             position: relative;
         }
 
         .wrapper {
-            display: inline-block;
             cursor: pointer;
-            transform: translateX(-200px);
         }
 
-        .name,
-        .subtitle,
-        .typing {
-            width: fit-content;
-            margin: 0 auto;
-            text-align: center;
+        /* BIG TEXT */
+        .big-text {
+            text-align: left;
+            line-height: 1.05;
+            position: relative;
         }
 
-        .name {
-            font-size: 160px;
+        .big-name {
+            font-size: 180px;
             font-weight: bold;
-            display: flex;
-            justify-content: center;
+            color: rgba(255, 255, 255, 0.28);
+            transition: opacity 0.5s ease;
         }
 
-        .name span {
-            display: inline-block;
-            transition: opacity 0.6s ease;
-        }
-
-        .space {
-            width: 28px;
-        }
-
-        .typing {
-            font-size: 28px;
+        .big-desc {
+            font-size: 150px;
             font-weight: bold;
-            max-width: 520px;
-            margin: 0 auto 12px;
-            line-height: 1.3;
-            min-height: 1.3em;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            color: rgba(255, 255, 255, 0.16);
+            transition: opacity 0.5s ease;
         }
 
-        .subtitle {
-            font-size: 64px;
+        .welcome {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 180px;
             font-weight: bold;
-            margin-top: 10px;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.5s ease;
+            color: rgba(255, 255, 255, 0.35);
+            pointer-events: none;
         }
 
-        /* hover behavior */
-        .wrapper:hover .name span {
+        .sub-welcome {
+            font-size: 45px; 
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.35); 
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            margin-top: 25px;
+            pointer-events: none;
+            white-space: pre-wrap;
+        }
+
+        /* HOVER EFFECT */
+        .wrapper:hover .big-name,
+        .wrapper:hover .big-desc {
             opacity: 0;
         }
 
-        .wrapper:hover .subtitle,
-        .wrapper:hover .typing {
+        .wrapper:hover .welcome,
+        .wrapper:hover .sub-welcome {
             opacity: 1;
         }
 
@@ -130,7 +133,8 @@
             position: absolute;
             bottom: 20px;
             width: 100%;
-            text-align: center;
+            text-align: left;
+            padding-left: 60px;
             font-size: 14px;
             z-index: 1;
         }
@@ -177,10 +181,11 @@
 
         .contact-wrapper:hover .contact-links {
             opacity: 1;
-            max-height: 500px; /* abbastanza grande per contenere tutti i link */
+            max-height: 500px;
         }
     </style>
 </head>
+
 <body>
 
     <canvas id="codeCanvas"></canvas>
@@ -193,18 +198,15 @@
     </div>
 
     <div class="container">
-        <div class="wrapper" id="trigger">
+        <div class="wrapper">
 
-            <div class="name">
-                <span>T</span><span>u</span><span>a</span><span>n</span><span>a</span>
-                <span class="space"></span>
-                <span>A</span><span>k</span><span>t</span><span>a</span><span>s</span>
-            </div>
-
-            <div class="typing" id="typingText"></div>
-
-            <div class="subtitle">
-                Welcome to my home
+            <div class="big-text">
+                <div class="big-name">Tuana Aktas</div>
+                <div class="big-desc">I’m a visual communication student</div>
+                <div class="welcome">
+                    Welcome to my home
+                    <div class="sub-welcome" id="typewriter"></div>
+                </div>
             </div>
 
         </div>
@@ -216,43 +218,12 @@
             <div class="contact-links">
                 <a href="https://example-link.com" target="_blank">Website</a>
                 <a href="mailto:example@example.com">Email</a>
-            
             </div>
         </div>
     </div>
 
     <script>
-        // TYPING EFFECT
-        const text = "Here you can find selected works and experiments made with HTML.";
-        const typingElement = document.getElementById("typingText");
-        const trigger = document.getElementById("trigger");
-
-        let index = 0;
-        let interval;
-
-        function startTyping() {
-            typingElement.textContent = "";
-            index = 0;
-
-            interval = setInterval(() => {
-                if (index < text.length) {
-                    typingElement.textContent += text.charAt(index);
-                    index++;
-                } else {
-                    clearInterval(interval);
-                }
-            }, 35);
-        }
-
-        function resetTyping() {
-            clearInterval(interval);
-            typingElement.textContent = "";
-        }
-
-        trigger.addEventListener("mouseenter", startTyping);
-        trigger.addEventListener("mouseleave", resetTyping);
-
-        // BACKGROUND COLOR SWITCH
+        /* BACKGROUND COLOR SWITCH */
         const colors = ["#0000ff", "#ff0000", "#ffff00"];
         let currentIndex = 0;
 
@@ -265,7 +236,7 @@
             document.body.style.backgroundColor = colors[currentIndex];
         });
 
-        // CANVAS CODE EFFECT
+        /* CANVAS CODE EFFECT */
         const canvas = document.getElementById('codeCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -288,29 +259,43 @@
             });
         }
 
-        let mouseOverText = false;
-        trigger.addEventListener("mouseenter", () => mouseOverText = true);
-        trigger.addEventListener("mouseleave", () => mouseOverText = false);
-
         function drawCode() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (!mouseOverText) {
-                ctx.font = "12px monospace";
-                ctx.fillStyle = "rgba(255,255,255,0.06)";
-                codeArray.forEach(c => {
-                    ctx.fillText(c.char, c.x, c.y);
-                    c.y += c.speed;
-                    if (c.y > canvas.height) c.y = 0;
-                    c.char = codeChars[Math.floor(Math.random() * codeChars.length)];
-                });
-            }
+            ctx.font = "12px monospace";
+            ctx.fillStyle = "rgba(255,255,255,0.06)";
+            codeArray.forEach(c => {
+                ctx.fillText(c.char, c.x, c.y);
+                c.y += c.speed;
+                if (c.y > canvas.height) c.y = 0;
+                c.char = codeChars[Math.floor(Math.random() * codeChars.length)];
+            });
 
             requestAnimationFrame(drawCode);
         }
+
         drawCode();
+
+        /* TYPEWRITER EFFECT */
+        const typewriterElement = document.getElementById('typewriter');
+        const typewriterText = "Here we can find selected works and experiments made with HTM";
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < typewriterText.length) {
+                typewriterElement.textContent += typewriterText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 60); // velocità digitazione
+            }
+        }
+
+        const wrapper = document.querySelector('.wrapper');
+        wrapper.addEventListener('mouseenter', () => {
+            typewriterElement.textContent = ""; // reset ogni volta
+            charIndex = 0;
+            typeWriter();
+        });
     </script>
 
 </body>
 </html>
-
