@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>ilmiosito</title>
+
     <style>
         html, body {
             margin: 0;
@@ -20,7 +21,6 @@
             transition: background-color 0.6s ease;
             z-index: 1;
         }
-        
 
         /* CANVAS BACKGROUND */
         #codeCanvas {
@@ -47,12 +47,16 @@
             position: relative;
         }
 
-        .top div {
+        .top div,
+        .top a {
             transition: opacity 0.4s ease;
             cursor: pointer;
+            color: white;
+            text-decoration: none;
         }
 
-        .top div:hover {
+        .top div:hover,
+        .top a:hover {
             opacity: 0;
         }
 
@@ -177,140 +181,141 @@
 
         .contact-wrapper:hover .contact-links {
             opacity: 1;
-            max-height: 500px; /* abbastanza grande per contenere tutti i link */
+            max-height: 500px;
         }
     </style>
 </head>
+
 <body>
 
-    <canvas id="codeCanvas"></canvas>
+<canvas id="codeCanvas"></canvas>
 
-    <div class="top">
-        <div>Exercise 1</div>
-        <div>Exercise 2</div>
-        <div>Exercise 3</div>
-        <div>Exercise 4</div>
+<div class="top">
+    <a href="http://tuanaaktas/Homepage/giorno2/index.html">Exercise 1</a>
+    <div>Exercise 2</div>
+    <div>Exercise 3</div>
+    <div>Exercise 4</div>
+</div>
+
+<div class="container">
+    <div class="wrapper" id="trigger">
+
+        <div class="name">
+            <span>T</span><span>u</span><span>a</span><span>n</span><span>a</span>
+            <span class="space"></span>
+            <span>A</span><span>k</span><span>t</span><span>a</span><span>s</span>
+        </div>
+
+        <div class="typing" id="typingText"></div>
+
+        <div class="subtitle">
+            Welcome to my home
+        </div>
+
     </div>
+</div>
 
-    <div class="container">
-        <div class="wrapper" id="trigger">
-
-            <div class="name">
-                <span>T</span><span>u</span><span>a</span><span>n</span><span>a</span>
-                <span class="space"></span>
-                <span>A</span><span>k</span><span>t</span><span>a</span><span>s</span>
-            </div>
-
-            <div class="typing" id="typingText"></div>
-
-            <div class="subtitle">
-                Welcome to my home
-            </div>
-
+<div class="footer">
+    <div class="contact-wrapper">
+        <span class="contact-text">How to contact me</span>
+        <div class="contact-links">
+            <a href="https://example-link.com" target="_blank">Website</a>
+            <a href="mailto:example@example.com">Email</a>
         </div>
     </div>
+</div>
 
-    <div class="footer">
-        <div class="contact-wrapper">
-            <span class="contact-text">How to contact me</span>
-            <div class="contact-links">
-                <a href="https://example-link.com" target="_blank">Website</a>
-                <a href="mailto:example@example.com">Email</a>
-            
-            </div>
-        </div>
-    </div>
+<script>
+    /* TYPING EFFECT */
+    const text = "Here you can find selected works and experiments made with HTML.";
+    const typingElement = document.getElementById("typingText");
+    const trigger = document.getElementById("trigger");
 
-    <script>
-        // TYPING EFFECT
-        const text = "Here you can find selected works and experiments made with HTML.";
-        const typingElement = document.getElementById("typingText");
-        const trigger = document.getElementById("trigger");
+    let index = 0;
+    let interval;
 
-        let index = 0;
-        let interval;
+    function startTyping() {
+        typingElement.textContent = "";
+        index = 0;
 
-        function startTyping() {
-            typingElement.textContent = "";
-            index = 0;
-
-            interval = setInterval(() => {
-                if (index < text.length) {
-                    typingElement.textContent += text.charAt(index);
-                    index++;
-                } else {
-                    clearInterval(interval);
-                }
-            }, 35);
-        }
-
-        function resetTyping() {
-            clearInterval(interval);
-            typingElement.textContent = "";
-        }
-
-        trigger.addEventListener("mouseenter", startTyping);
-        trigger.addEventListener("mouseleave", resetTyping);
-
-        // BACKGROUND COLOR SWITCH
-        const colors = ["#0000ff", "#ff0000", "#ffff00"];
-        let currentIndex = 0;
-
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowRight") {
-                currentIndex = (currentIndex + 1) % colors.length;
-            } else if (event.key === "ArrowLeft") {
-                currentIndex = (currentIndex - 1 + colors.length) % colors.length;
+        interval = setInterval(() => {
+            if (index < text.length) {
+                typingElement.textContent += text.charAt(index);
+                index++;
+            } else {
+                clearInterval(interval);
             }
-            document.body.style.backgroundColor = colors[currentIndex];
-        });
+        }, 35);
+    }
 
-        // CANVAS CODE EFFECT
-        const canvas = document.getElementById('codeCanvas');
-        const ctx = canvas.getContext('2d');
+    function resetTyping() {
+        clearInterval(interval);
+        typingElement.textContent = "";
+    }
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+    trigger.addEventListener("mouseenter", startTyping);
+    trigger.addEventListener("mouseleave", resetTyping);
+
+    /* BACKGROUND COLOR SWITCH */
+    const colors = ["#0000ff", "#ff0000", "#ffff00"];
+    let currentIndex = 0;
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight") {
+            currentIndex = (currentIndex + 1) % colors.length;
+        } else if (event.key === "ArrowLeft") {
+            currentIndex = (currentIndex - 1 + colors.length) % colors.length;
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        document.body.style.backgroundColor = colors[currentIndex];
+    });
 
-        const codeChars = ['<','>','/','{','}',';',':','(',')','=','+','-','"',"'",'a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'];
-        let codeArray = [];
+    /* CANVAS CODE EFFECT */
+    const canvas = document.getElementById("codeCanvas");
+    const ctx = canvas.getContext("2d");
 
-        for (let i = 0; i < 200; i++) {
-            codeArray.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                speed: 0.3 + Math.random() * 0.7,
-                char: codeChars[Math.floor(Math.random() * codeChars.length)]
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    const codeChars = ['<','>','/','{','}',';',':','(',')','=','+','-','"',"'",'a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'];
+    let codeArray = [];
+
+    for (let i = 0; i < 200; i++) {
+        codeArray.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            speed: 0.3 + Math.random() * 0.7,
+            char: codeChars[Math.floor(Math.random() * codeChars.length)]
+        });
+    }
+
+    let mouseOverText = false;
+    trigger.addEventListener("mouseenter", () => mouseOverText = true);
+    trigger.addEventListener("mouseleave", () => mouseOverText = false);
+
+    function drawCode() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (!mouseOverText) {
+            ctx.font = "12px monospace";
+            ctx.fillStyle = "rgba(255,255,255,0.06)";
+            codeArray.forEach(c => {
+                ctx.fillText(c.char, c.x, c.y);
+                c.y += c.speed;
+                if (c.y > canvas.height) c.y = 0;
+                c.char = codeChars[Math.floor(Math.random() * codeChars.length)];
             });
         }
 
-        let mouseOverText = false;
-        trigger.addEventListener("mouseenter", () => mouseOverText = true);
-        trigger.addEventListener("mouseleave", () => mouseOverText = false);
+        requestAnimationFrame(drawCode);
+    }
 
-        function drawCode() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (!mouseOverText) {
-                ctx.font = "12px monospace";
-                ctx.fillStyle = "rgba(255,255,255,0.06)";
-                codeArray.forEach(c => {
-                    ctx.fillText(c.char, c.x, c.y);
-                    c.y += c.speed;
-                    if (c.y > canvas.height) c.y = 0;
-                    c.char = codeChars[Math.floor(Math.random() * codeChars.length)];
-                });
-            }
-
-            requestAnimationFrame(drawCode);
-        }
-        drawCode();
-    </script>
+    drawCode();
+</script>
 
 </body>
 </html>
-
