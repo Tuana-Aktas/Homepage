@@ -33,18 +33,20 @@
             z-index: 0;
         }
 
-        /* TOP */
+        /* BOTTOM RIGHT BLOCK */
         .top {
             display: flex;
-            justify-content: flex-start;
+            justify-content: flex-end;
             gap: 60px;
-            padding-top: 25px;
-            padding-left: 60px;
+            padding-bottom: 25px;
+            padding-right: 60px;
             font-weight: bold;
             font-size: 18px;
             letter-spacing: 1px;
             z-index: 1;
-            position: relative;
+            position: absolute;
+            bottom: 0;
+            right: 0;
         }
 
         .top div {
@@ -104,13 +106,25 @@
             pointer-events: none;
         }
 
+        .sub-welcome {
+            font-size: 45px; 
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.35); 
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            margin-top: 25px;
+            pointer-events: none;
+            white-space: pre-wrap;
+        }
+
         /* HOVER EFFECT */
         .wrapper:hover .big-name,
         .wrapper:hover .big-desc {
             opacity: 0;
         }
 
-        .wrapper:hover .welcome {
+        .wrapper:hover .welcome,
+        .wrapper:hover .sub-welcome {
             opacity: 1;
         }
 
@@ -189,7 +203,10 @@
             <div class="big-text">
                 <div class="big-name">Tuana Aktas</div>
                 <div class="big-desc">I’m a visual communication student</div>
-                <div class="welcome">Welcome to my home</div>
+                <div class="welcome">
+                    Welcome to my home
+                    <div class="sub-welcome" id="typewriter"></div>
+                </div>
             </div>
 
         </div>
@@ -258,6 +275,26 @@
         }
 
         drawCode();
+
+        /* TYPEWRITER EFFECT */
+        const typewriterElement = document.getElementById('typewriter');
+        const typewriterText = "Here we can find selected works and experiments made with HTM";
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < typewriterText.length) {
+                typewriterElement.textContent += typewriterText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 60); // velocità digitazione
+            }
+        }
+
+        const wrapper = document.querySelector('.wrapper');
+        wrapper.addEventListener('mouseenter', () => {
+            typewriterElement.textContent = ""; // reset ogni volta
+            charIndex = 0;
+            typeWriter();
+        });
     </script>
 
 </body>
