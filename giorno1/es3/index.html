@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>ilmiosito</title>
-
     <style>
         html, body {
             margin: 0;
@@ -33,7 +32,7 @@
             z-index: 0;
         }
 
-        /* BOTTOM RIGHT BLOCK */
+        /* TOP RIGHT BLOCK (EXERCISE) */
         .top {
             display: flex;
             justify-content: flex-end;
@@ -50,12 +49,14 @@
         }
 
         .top div {
-            transition: opacity 0.4s ease;
+            transition: all 0.3s ease; /* transizione fluida */
             cursor: pointer;
         }
 
+        /* HOVER EFFECT: leggero ingrandimento */
         .top div:hover {
-            opacity: 0;
+            transform: scale(1.1);
+            opacity: 1; /* rimane pienamente visibile */
         }
 
         /* CENTER */
@@ -117,7 +118,7 @@
             white-space: pre-wrap;
         }
 
-        /* HOVER EFFECT */
+        /* HOVER EFFECT CENTER */
         .wrapper:hover .big-name,
         .wrapper:hover .big-desc {
             opacity: 0;
@@ -261,7 +262,6 @@
 
         function drawCode() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             ctx.font = "12px monospace";
             ctx.fillStyle = "rgba(255,255,255,0.06)";
             codeArray.forEach(c => {
@@ -270,7 +270,6 @@
                 if (c.y > canvas.height) c.y = 0;
                 c.char = codeChars[Math.floor(Math.random() * codeChars.length)];
             });
-
             requestAnimationFrame(drawCode);
         }
 
@@ -285,13 +284,13 @@
             if (charIndex < typewriterText.length) {
                 typewriterElement.textContent += typewriterText.charAt(charIndex);
                 charIndex++;
-                setTimeout(typeWriter, 60); // velocità digitazione
+                setTimeout(typeWriter, 60);
             }
         }
 
         const wrapper = document.querySelector('.wrapper');
         wrapper.addEventListener('mouseenter', () => {
-            typewriterElement.textContent = ""; // reset ogni volta
+            typewriterElement.textContent = "";
             charIndex = 0;
             typeWriter();
         });
