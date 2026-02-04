@@ -1,13 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-	<script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
-</head>
-<body>
+function setup() {
+  createCanvas(400, 400)
+  background(0)
+}
 
-	<script src="sketch.js"></script>
-</body>
-</html>
+function draw() {
+  // scia luminosa
+  background(0, 30)
+
+  let px = mouseX
+  let py = mouseY
+  let s  = 12
+
+  noFill()
+
+  // effetto glow
+  drawingContext.shadowBlur = 20
+  drawingContext.shadowColor = color(0, 255, 255)
+
+  stroke(0, 255, 255)
+  strokeWeight(2)
+
+  // ---- LETTERA T ----
+  beginShape()
+  vertex(px + 0*s + random(-1,1), py + 0*s)
+  vertex(px + 4*s + random(-1,1), py + 0*s)
+  vertex(px + 2.6*s + random(-1,1), py + 0*s)
+  vertex(px + 2.6*s + random(-1,1), py + 10*s)
+  vertex(px + 1.4*s + random(-1,1), py + 10*s)
+  vertex(px + 1.4*s + random(-1,1), py + 0*s)
+  endShape(CLOSE)
+
+  // ---- LETTERA A ----
+  let ax = px + 6*s
+
+  drawingContext.shadowColor = color(255, 0, 255)
+  stroke(255, 0, 255)
+
+  beginShape()
+  vertex(ax + 0*s + random(-1,1), py + 10*s)
+  vertex(ax + 2*s + random(-1,1), py + 0*s)
+  vertex(ax + 4*s + random(-1,1), py + 10*s)
+  vertex(ax + 3.2*s, py + 10*s)
+  vertex(ax + 2.6*s, py + 6.5*s)
+  vertex(ax + 1.4*s, py + 6.5*s)
+  vertex(ax + 0.8*s, py + 10*s)
+  endShape(CLOSE)
+}
