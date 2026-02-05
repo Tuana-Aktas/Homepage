@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden; 
-            background-color: black;
+            background-color: blue;
         }
         canvas {
             display: block; /* Evita piccoli spazi bianchi sotto il canvas */
@@ -42,7 +42,8 @@
         }
 
         function draw(){
-            background(0);
+            // Prima era nero → ora blu
+            background(0, 0, 255);
             noStroke();
 
             let numH = faccione.width;
