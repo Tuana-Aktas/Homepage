@@ -1,96 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-	<style>
-		body {
-			background-color: black;
-			margin: 0;
-			height: 100vh;
-			overflow: hidden;
-		}
-		.back-btn {
-			position: fixed;
-			top: 48px;
-			left: 100px;
-			color: white;
-			font-size: 30px;
-			text-decoration: none;
-			z-index: 999;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <title>Z Animata - Linee in Movimento</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        canvas {
+            border: 1px solid #333;
+        }
+    </style>
 </head>
 <body>
-	<a href="../index.html" class="back-btn">&larr;</a>
-	<script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
-	<script>
 
-		let font
-		let pts = []
-		let bounds
-		let jX, jY
+<canvas id="zCanvas"></canvas>
 
-		function preload() {
-			font = loadFont('../Fonts/Bakemono-Mono-Regular.ttf')
-		}
+<script>
+    const canvas = document.getElementById('zCanvas');
+    const ctx = canvas.getContext('2d');
 
-		function setup() {
-			createCanvas(windowWidth, windowHeight)
-			jX = width / 2
-			jY = height / 2 - 150
-			
-			let txt = 'ZTL'
-			let fontSize = 150
-			
-			bounds = font.textBounds(txt, 0, 0, fontSize)
-			pts = font.textToPoints(txt, -bounds.w / 2, bounds.h / 2, fontSize, {
-				sampleFactor: 0.25,
-				simplifyThreshold: 0
-			})
-		}
+    // Setup dimensioni
+    canvas.width = 500;
+    canvas.height = 600;
 
-		function windowResized() {
-			resizeCanvas(windowWidth, windowHeight)
-		}
+    // Definiamo i punti della "Z" (coordinate relative)
+    const points = [
+        {x: 100, y: 100}, // Top Left
+        {x: 400, y: 100}, // Top Right
+        {x: 100, y: 500}, // Bottom Left
+        {x: 400, y: 500}  // Bottom Right
+    ];
 
-		function draw() {
-			background(0)
-			
-			let targetX = mouseX
-			let targetY = mouseY
-			if (mouseX === 0 && mouseY === 0) {
-				targetX = width / 2
-				targetY = height / 2 - 150
-			}
-			jX = lerp(jX, targetX, 0.05)
-			jY = lerp(jY, targetY, 0.05)
-			translate(jX, jY)
+    const numLines = 5;      // Numero di linee parallele
+    const spacing = 12;      // Distanza tra le linee
+    let offset = 0;          // Offset per l'animazione
 
-			let layers = 40
-			for (let i = 0; i < layers; i++) {
-				let t = frameCount * 0.02
-				let progress = i / layers
-				let alpha = map(progress, 0, 1, 255, 0)
-				stroke(255, alpha)
-				strokeWeight(2)
-				
-				let wave = sin(t * 3 + progress * 4) * map(progress, 0, 1, 0, 100)
-				let expansion = map(sin(t * 2 - progress * PI), -1, 1, 0.9, 1.1)
-				let yOff = i * 8
-				
-				beginShape(POINTS)
-				for (let p of pts) {
-					let px = p.x * expansion + wave
-					let py = p.y + yOff
-					let nX = map(noise(p.x * 0.01, p.y * 0.01, t), 0, 1, -10, 10)
-					let nY = map(noise(p.x * 0.01 + 100, p.y * 0.01, t), 0, 1, -10, 10)
-					vertex(px + nX, py + nY)
-				}
-				endShape()
-			}
-		}
-	</script>
+    function draw() {
+        // Pulizia semi-trasparente per creare l'effetto scia (motion blur)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 3;
+
+        for (let i = 0; i < numLines; i++) {
+            // Calcoliamo lo spostamento per ogni linea parallela
+            const s = i * spacing;
+            
+            // Colore bianco brillante
+            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - i * 0.15})`;
+            
+            // Dash pattern: crea segmenti che si muovono
+            // [lunghezza_tratto, spazio_vuoto]
+            ctx.setLineDash([120, 200]);
+            ctx.lineDashOffset = -offset * (1 + i * 0.1); // Velocità leggermente diverse
+
+            ctx.beginPath();
+            // Disegniamo la forma a Z con l'offset per le linee parallele
+            ctx.moveTo(points[0].x + s, points[0].y + s);
+            ctx.lineTo(points[1].x + s, points[1].y + s);
+            ctx.lineTo(points[2].x + s, points[2].y + s);
+            ctx.lineTo(points[3].x + s, points[3].y + s);
+            ctx.stroke();
+        }
+
+        offset += 4; // Velocità del movimento
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+</script>
+
 </body>
 </html>
