@@ -15,10 +15,16 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: #0000ff;
+            background-color: #0000ff; /* Partenza Blu */
             font-family: Helvetica, Arial, sans-serif;
             color: white;
             overflow: hidden;
+            transition: background-color 0.6s ease, color 0.6s ease;
+        }
+
+        /* Classe per lo sfondo giallo (dettagli neri) */
+        body.dark-mode {
+            color: black;
         }
 
         /* TITOLO SINISTRA */
@@ -33,6 +39,11 @@
             line-height: 1.05;
             pointer-events: none;
             z-index: 10;
+            transition: color 0.6s ease;
+        }
+
+        body.dark-mode .big-title {
+            color: rgba(0, 0, 0, 0.28);
         }
 
         /* DESCRIZIONE DESTRA */
@@ -49,8 +60,11 @@
             pointer-events: none;
             z-index: 10;
             max-width: 60%;
-            /* Cursore opzionale per l'effetto macchina da scrivere */
-            border-right: 8px solid rgba(255, 255, 255, 0); 
+            transition: color 0.6s ease;
+        }
+
+        body.dark-mode .big-description {
+            color: rgba(0, 0, 0, 0.16);
         }
 
         .chart-container {
@@ -61,7 +75,7 @@
         }
     </style>
 </head>
-<body>
+<body class="theme-blue">
 
     <h2 class="big-title">Activity</h2>
     <h2 class="big-description" id="typewriter-text"></h2>
@@ -71,75 +85,112 @@
     </div>
 
 <script>
-    /* --- EFFETTO MACCHINA DA SCRIVERE --- */
-    const textElement = document.getElementById('typewriter-text');
-    const textToType = "Tuana's MacBook Pro";
-    let index = 0;
+    /* --- LOGICA CAMBIO COLORE --- */
+    const colors = ["#0000ff", "#ff0000", "#ffff00"];
+    let currentIndex = 0;
+    
+    // Riferimento al grafico per poterlo aggiornare
+    let activityChart;
 
-    function typeEffect() {
-        if (index < textToType.length) {
-            textElement.textContent += textToType.charAt(index);
-            index++;
-            setTimeout(typeEffect, 100); // Velocità della battuta (100ms)
+    function updateTheme() {
+        const selectedColor = colors[currentIndex];
+        document.body.style.backgroundColor = selectedColor;
+
+        // Se è giallo (indice 2), aggiungi classe dark-mode e aggiorna grafico in nero
+        if (selectedColor === "#ffff00") {
+            document.body.classList.add('dark-mode');
+            updateChartColor('black');
+        } else {
+            document.body.classList.remove('dark-mode');
+            updateChartColor('white');
         }
     }
 
-    // Avvia l'effetto al caricamento
-    window.onload = typeEffect;
+    function updateChartColor(newColor) {
+        if (!activityChart) return;
+        
+        // Aggiorna colori del dataset
+        activityChart.data.datasets[0].borderColor = newColor === 'black' ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)';
+        activityChart.data.datasets[0].pointBackgroundColor = newColor;
+        
+        // Aggiorna ticks (testi delle date)
+        activityChart.options.scales.x.ticks.color = newColor === 'black' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.3)';
+        
+        activityChart.update();
+    }
 
-    /* --- GRAFICO CHART.JS --- */
-    const ctx = document.getElementById('minimalChart').getContext('2d');
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Nov 13', 'Nov 29', 'Nov 30', 'Jan 10', 'Jan 12', 'Jan 17', 'Feb 4', 'Feb 5'],
-            datasets: [{
-                data: [868.43, 759.71, 45.43, 983.58, 47.97, 119.92, 431.97, 14.89],
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-                borderWidth: 3,
-                pointBackgroundColor: 'white',
-                pointRadius: 4,
-                tension: 0.4, 
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animations: {
-                tension: {
-                    duration: 2500,
-                    easing: 'easeInOutSine',
-                    from: 0.3,
-                    to: 0.6,
-                    loop: true
-                },
-                radius: {
-                    duration: 1800,
-                    easing: 'easeInOutQuad',
-                    from: 3,
-                    to: 6,
-                    loop: true
-                }
-            },
-            plugins: { legend: { display: false } },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    border: { display: false },
-                    ticks: { 
-                        color: 'rgba(255,255,255,0.3)', 
-                        font: { size: 12, weight: 'bold' } 
-                    }
-                },
-                y: {
-                    display: false,
-                    grid: { display: false }
-                }
-            }
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight") {
+            currentIndex = (currentIndex + 1) % colors.length;
+            updateTheme();
+        } else if (event.key === "ArrowLeft") {
+            currentIndex = (currentIndex - 1 + colors.length) % colors.length;
+            updateTheme();
         }
     });
+
+    /* --- EFFETTO MACCHINA DA SCRIVERE --- */
+    const textElement = document.getElementById('typewriter-text');
+    const textToType = "Tuana's MacBook Pro";
+    let typeIndex = 0;
+
+    function typeEffect() {
+        if (typeIndex < textToType.length) {
+            textElement.textContent += textToType.charAt(typeIndex);
+            typeIndex++;
+            setTimeout(typeEffect, 100);
+        }
+    }
+
+    /* --- GRAFICO CHART.JS --- */
+    window.onload = () => {
+        typeEffect();
+        const ctx = document.getElementById('minimalChart').getContext('2d');
+        
+        activityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Nov 13', 'Nov 29', 'Nov 30', 'Jan 10', 'Jan 12', 'Jan 17', 'Feb 4', 'Feb 5'],
+                datasets: [{
+                    data: [868.43, 759.71, 45.43, 983.58, 47.97, 119.92, 431.97, 14.89],
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'white',
+                    pointRadius: 4,
+                    tension: 0.4, 
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animations: {
+                    tension: {
+                        duration: 2500,
+                        easing: 'easeInOutSine',
+                        from: 0.3,
+                        to: 0.6,
+                        loop: true
+                    }
+                },
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { 
+                            color: 'rgba(255,255,255,0.3)', 
+                            font: { size: 12, weight: 'bold' } 
+                        }
+                    },
+                    y: {
+                        display: false,
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    };
 </script>
 
 </body>
