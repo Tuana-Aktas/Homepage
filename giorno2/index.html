@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>G02E07: Disegno faccione Fullscreen</title>
     <style>
-        /* Rimuove margini e scrollbar per un look pulito */
         body {
             margin: 0;
             padding: 0;
             overflow: hidden; 
-            background-color: blue;
+            /* Rimuoviamo il background-color fisso dal CSS perché lo gestisce p5 */
         }
         canvas {
-            display: block; /* Evita piccoli spazi bianchi sotto il canvas */
+            display: block;
         }
     </style>
 </head>
@@ -21,36 +20,42 @@
     <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
     <script>
         let faccione;
+        // Array dei colori: Blu, Rosso, Giallo
+        const colori = [[0, 0, 255], [255, 0, 0], [255, 255, 0]];
+        let indiceColore = 0;
 
         function preload() {
-            // Assicurati che il percorso dell'immagine sia corretto
             faccione = loadImage('MICIO.png');
         }
 
         function setup() {
-            // Crea il canvas grande quanto la finestra del browser
             createCanvas(windowWidth, windowHeight);
-            
-            // Ridimensioniamo l'immagine in base alla risoluzione dello schermo
-            // mantenendo le proporzioni
             faccione.resize(faccione.width / 7, 0); 
         }
 
-        // Se l'utente ridimensiona la finestra, il canvas si adatta
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
         }
 
+        // Funzione per intercettare i tasti
+        function keyPressed() {
+            if (keyCode === RIGHT_ARROW) {
+                indiceColore = (indiceColore + 1) % colori.length;
+            } else if (keyCode === LEFT_ARROW) {
+                indiceColore = (indiceColore - 1 + colori.length) % colori.length;
+            }
+        }
+
         function draw(){
-            // Prima era nero → ora blu
-            background(0, 0, 255);
+            // Imposta il background in base all'indice corrente
+            background(colori[indiceColore]);
+            
             noStroke();
 
             let numH = faccione.width;
             let numV = faccione.height;
             let d = 8;
 
-            // Centratura automatica basata sulle nuove dimensioni width e height
             let ox = (width - (numH - 1) * d) / 2;
             let oy = (height - (numV - 1) * d) / 2;
 
@@ -68,9 +73,14 @@
                     if (al < 250) continue;
                     
                     let br = brightness(col);
-                    fill(255);
                     
-                    // L'effetto noise ora si muove su tutto lo schermo
+                    // Gestione leggibilità: se lo sfondo è giallo (indice 2), i puntini diventano neri
+                    if (indiceColore === 2) {
+                        fill(0);
+                    } else {
+                        fill(255);
+                    }
+                    
                     let px = ox + i * d + map(noise(i * 0.02 + nx, j * 0.02 + ny, nz), 0, 1, -amount, amount);
                     let py = oy + j * d + map(noise(i * 0.02 + nx, j * 0.02 + ny, nz + 5), 0, 1, -amount, amount);
                     
