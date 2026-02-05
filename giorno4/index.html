@@ -1,21 +1,146 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sfondo Blu</title>
+    <title>Activity Dashboard - Tuana Style</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            background-color: #0000ff; /* Il blu che hai richiesto */
             margin: 0;
             padding: 0;
-            color: white; /* Rende il testo leggibile su sfondo scuro */
-            font-family: sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #0000ff;
+            font-family: Helvetica, Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* TITOLO SINISTRA */
+        .big-title {
+            position: absolute;
+            top: 8px;
+            left: 60px;
+            margin: 0;
+            font-size: 180px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.28);
+            line-height: 1.05;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* DESCRIZIONE DESTRA */
+        .big-description {
+            position: absolute;
+            top: 220px; 
+            right: 50px;
+            margin: 0;
+            font-size: 150px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.16);
+            line-height: 1.05;
+            text-align: right;
+            pointer-events: none;
+            z-index: 10;
+            max-width: 60%;
+            /* Cursore opzionale per l'effetto macchina da scrivere */
+            border-right: 8px solid rgba(255, 255, 255, 0); 
+        }
+
+        .chart-container {
+            width: 90vw;
+            height: 55vh;
+            margin-top: 240px;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
 
+    <h2 class="big-title">Activity</h2>
+    <h2 class="big-description" id="typewriter-text"></h2>
+
+    <div class="chart-container">
+        <canvas id="minimalChart"></canvas>
+    </div>
+
+<script>
+    /* --- EFFETTO MACCHINA DA SCRIVERE --- */
+    const textElement = document.getElementById('typewriter-text');
+    const textToType = "Tuana's MacBook Pro";
+    let index = 0;
+
+    function typeEffect() {
+        if (index < textToType.length) {
+            textElement.textContent += textToType.charAt(index);
+            index++;
+            setTimeout(typeEffect, 100); // Velocità della battuta (100ms)
+        }
+    }
+
+    // Avvia l'effetto al caricamento
+    window.onload = typeEffect;
+
+    /* --- GRAFICO CHART.JS --- */
+    const ctx = document.getElementById('minimalChart').getContext('2d');
     
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Nov 13', 'Nov 29', 'Nov 30', 'Jan 10', 'Jan 12', 'Jan 17', 'Feb 4', 'Feb 5'],
+            datasets: [{
+                data: [868.43, 759.71, 45.43, 983.58, 47.97, 119.92, 431.97, 14.89],
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+                borderWidth: 3,
+                pointBackgroundColor: 'white',
+                pointRadius: 4,
+                tension: 0.4, 
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animations: {
+                tension: {
+                    duration: 2500,
+                    easing: 'easeInOutSine',
+                    from: 0.3,
+                    to: 0.6,
+                    loop: true
+                },
+                radius: {
+                    duration: 1800,
+                    easing: 'easeInOutQuad',
+                    from: 3,
+                    to: 6,
+                    loop: true
+                }
+            },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: { 
+                        color: 'rgba(255,255,255,0.3)', 
+                        font: { size: 12, weight: 'bold' } 
+                    }
+                },
+                y: {
+                    display: false,
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+</script>
+
 </body>
 </html>
