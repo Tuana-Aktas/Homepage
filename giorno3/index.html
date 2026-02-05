@@ -14,7 +14,7 @@
             align-items: center;
             overflow: hidden;
             font-family: 'Arial', sans-serif;
-            transition: background-color 0.4s ease;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         #ui {
@@ -32,9 +32,20 @@
             color: white;
             outline: none;
             font-size: 18px;
+            transition: all 0.4s ease;
         }
         
         input::placeholder { color: rgba(255,255,255,0.6); }
+
+        /* Classi per il contrasto quando lo sfondo è giallo */
+        body.dark-mode input {
+            color: black;
+            border-color: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.1);
+        }
+        body.dark-mode input::placeholder {
+            color: rgba(0,0,0,0.5);
+        }
 
         #container {
             position: relative;
@@ -44,11 +55,11 @@
 
         .dot {
             position: absolute;
-            width: 5px; /* Leggermente più grandi per riempire meglio */
+            width: 5px;
             height: 5px;
             background-color: white;
             border-radius: 50%;
-            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s;
+            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s, background-color 0.4s ease;
             pointer-events: none;
         }
     </style>
@@ -65,10 +76,9 @@
         const container = document.getElementById('container');
         const input = document.getElementById('userInput');
         const dots = [];
-        const MAX_DOTS = 1500; // Aumentato il numero di palline per lettere più grandi
-        const coloriPrimari = ['blue', 'red', 'yellow', 'white'];
+        const MAX_DOTS = 1500; 
+        const coloriPrimari = ['blue', 'red', 'yellow']; // Teniamo solo i colori di sfondo principali
         let indiceSfondo = 0;
-        let indicePuntini = 3;
 
         for (let i = 0; i < MAX_DOTS; i++) {
             const dot = document.createElement('div');
@@ -83,12 +93,10 @@
         function updateText(text) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            // Canvas più grande per lettere più definite
             canvas.width = 1000;
             canvas.height = 400;
 
             ctx.fillStyle = "white";
-            // FONT MOLTO PIÙ GRANDE (180px invece di 120px)
             ctx.font = "bold 220px Arial"; 
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -97,12 +105,10 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             const points = [];
 
-            // Scansione pixel
             for (let y = 0; y < canvas.height; y += 6) {
                 for (let x = 0; x < canvas.width; x += 6) {
                     const index = (y * canvas.width + x) * 4;
                     if (imageData[index + 3] > 128) {
-                        // Mappatura su scala più ampia dello schermo
                         points.push({ 
                             x: (x / canvas.width) * 90 - 45, 
                             y: (y / canvas.height) * 80 - 40 
@@ -118,14 +124,19 @@
                     dot.style.opacity = "1";
                 } else {
                     dot.style.opacity = "0";
-                    // Le palline extra si disperdono fuori campo
-                    if (dot.style.opacity === "1") {
-                        const randX = (Math.random()-0.5)*150;
-                        const randY = (Math.random()-0.5)*150;
-                        dot.style.transform = `translate(${randX}vw, ${randY}vh)`;
-                    }
                 }
             });
+        }
+
+        // Funzione per gestire il cambio tema (Bianco/Nero)
+        function checkTheme(color) {
+            if (color === 'yellow') {
+                document.body.classList.add('dark-mode');
+                dots.forEach(dot => dot.style.backgroundColor = 'black');
+            } else {
+                document.body.classList.remove('dark-mode');
+                dots.forEach(dot => dot.style.backgroundColor = 'white');
+            }
         }
 
         input.addEventListener('keypress', (e) => {
@@ -136,17 +147,20 @@
         });
 
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            if (event.key === 'ArrowRight') {
                 indiceSfondo = (indiceSfondo + 1) % coloriPrimari.length;
-                document.body.style.backgroundColor = coloriPrimari[indiceSfondo];
+                const nuovoColore = coloriPrimari[indiceSfondo];
+                document.body.style.backgroundColor = nuovoColore;
+                checkTheme(nuovoColore);
             }
-            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                indicePuntini = (indicePuntini + 1) % coloriPrimari.length;
-                dots.forEach(dot => dot.style.backgroundColor = coloriPrimari[indicePuntini]);
+            if (event.key === 'ArrowLeft') {
+                indiceSfondo = (indiceSfondo - 1 + coloriPrimari.length) % coloriPrimari.length;
+                const nuovoColore = coloriPrimari[indiceSfondo];
+                document.body.style.backgroundColor = nuovoColore;
+                checkTheme(nuovoColore);
             }
         });
 
-        // Click per esplosione
         document.body.addEventListener('mousedown', (e) => {
             if(e.target === input) return;
             dots.forEach(dot => {
