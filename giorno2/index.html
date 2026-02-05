@@ -3,26 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G02E07: Disegno faccione Fullscreen</title>
+    <title>G02E07: Faccione con Transizione Smooth</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden; 
-            /* Rimuoviamo il background-color fisso dal CSS perché lo gestisce p5 */
+            overflow: hidden;
+            /* La transizione magica che hai visto nel secondo codice */
+            transition: background-color 0.6s ease;
+            background-color: #0000ff; /* Partenza Blu */
         }
+
+        /* Classi per il cambio colore gestito via CSS */
+        body.bg-blue { background-color: #0000ff; }
+        body.bg-red { background-color: #ff0000; }
+        body.bg-yellow { background-color: #ffff00; }
+
         canvas {
             display: block;
         }
     </style>
 </head>
-<body>
+<body class="bg-blue">
+
     <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
     <script>
         let faccione;
-        // Array dei colori: Blu, Rosso, Giallo
-        const colori = [[0, 0, 255], [255, 0, 0], [255, 255, 0]];
-        let indiceColore = 0;
+        // Array dei nomi delle classi CSS
+        const classiColore = ["bg-blue", "bg-red", "bg-yellow"];
+        let indice = 0;
 
         function preload() {
             faccione = loadImage('MICIO.png');
@@ -37,52 +46,59 @@
             resizeCanvas(windowWidth, windowHeight);
         }
 
-        // Funzione per intercettare i tasti
         function keyPressed() {
             if (keyCode === RIGHT_ARROW) {
-                indiceColore = (indiceColore + 1) % colori.length;
+                indice = (indice + 1) % classiColore.length;
+                aggiornaClasseSfondo();
             } else if (keyCode === LEFT_ARROW) {
-                indiceColore = (indiceColore - 1 + colori.length) % colori.length;
+                indice = (indice - 1 + classiColore.length) % classiColore.length;
+                aggiornaClasseSfondo();
             }
         }
 
-        function draw(){
-            // Imposta il background in base all'indice corrente
-            background(colori[indiceColore]);
+        function aggiornaClasseSfondo() {
+            // Rimuove tutte le possibili classi e aggiunge quella corrente
+            document.body.className = classiColore[indice];
+        }
+
+        function draw() {
+            // IMPORTANTE: clear() serve a rendere il canvas trasparente 
+            // così vediamo il colore di sfondo del BODY sotto
+            clear();
             
             noStroke();
 
+            let d = 8; 
             let numH = faccione.width;
             let numV = faccione.height;
-            let d = 8;
 
             let ox = (width - (numH - 1) * d) / 2;
             let oy = (height - (numV - 1) * d) / 2;
 
             let amount = mouseX * 0.3;
 
-            let ny = frameCount * 0.011;
             let nx = frameCount * 0.031;
+            let ny = frameCount * 0.011;
             let nz = frameCount * 0.014;
 
-            for (let j=0; j<numV; j++) {
-                for(let i=0; i<numH; i++) {
+            for (let j = 0; j < numV; j++) {
+                for (let i = 0; i < numH; i++) {
                     let col = faccione.get(i, j);
-                    let al = alpha(col);
                     
-                    if (al < 250) continue;
+                    if (alpha(col) < 200) continue;
                     
                     let br = brightness(col);
                     
-                    // Gestione leggibilità: se lo sfondo è giallo (indice 2), i puntini diventano neri
-                    if (indiceColore === 2) {
+                    // --- LOGICA COLORE PUNTINI ---
+                    // Se l'indice è 2 (Giallo), punti Neri. Altrimenti Bianchi.
+                    if (indice === 2) { 
                         fill(0);
                     } else {
                         fill(255);
                     }
                     
-                    let px = ox + i * d + map(noise(i * 0.02 + nx, j * 0.02 + ny, nz), 0, 1, -amount, amount);
-                    let py = oy + j * d + map(noise(i * 0.02 + nx, j * 0.02 + ny, nz + 5), 0, 1, -amount, amount);
+                    let px = ox + i * d + map(noise(i * 0.05 + nx, j * 0.05 + ny, nz), 0, 1, -amount, amount);
+                    let py = oy + j * d + map(noise(i * 0.05 + nx, j * 0.05 + ny, nz + 5), 0, 1, -amount, amount);
                     
                     circle(px, py, br * 0.1);
                 }
