@@ -24,7 +24,7 @@
             color: black;
         }
 
-        /* TOP RIGHT BLOCK (EXERCISES) */
+        /* TOP RIGHT BLOCK */
         .top {
             display: flex;
             justify-content: flex-end;
@@ -40,7 +40,7 @@
             z-index: 10;
         }
 
-        .top a {
+        .top a, .ex-trigger {
             text-decoration: none;
             color: inherit;
             cursor: pointer;
@@ -51,7 +51,7 @@
             opacity: 0.6;
         }
 
-        /* 4 FRECCE E TESTO "CHANGE COLOR" - EFFETTO NOTIFICA */
+        /* ARROW NOTIFICATION */
         .arrows-wrapper {
             position: absolute;
             bottom: 85px;
@@ -61,14 +61,14 @@
             align-items: center;
             gap: 8px;
             z-index: 20;
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 1s ease, visibility 1s ease;
-        }
-
-        .arrows-wrapper.hidden {
             opacity: 0;
             visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .arrows-wrapper.visible {
+            opacity: 1;
+            visibility: visible;
         }
 
         .arrows-container {
@@ -129,28 +129,25 @@
             z-index: 1;
         }
 
-        .wrapper {
-            cursor: pointer;
-        }
-
         .big-text {
             text-align: left;
             line-height: 1.05;
             position: relative;
+            display: inline-block;
         }
 
         .big-name {
             font-size: 180px;
             font-weight: bold;
             color: rgba(255, 255, 255, 0.28);
-            transition: opacity 0.5s ease, color 0.5s ease;
+            transition: opacity 0.5s ease;
         }
 
         .big-desc {
             font-size: 150px;
             font-weight: bold;
             color: rgba(255, 255, 255, 0.16);
-            transition: opacity 0.5s ease, color 0.5s ease;
+            transition: opacity 0.5s ease;
         }
 
         body.dark-text .big-name { color: rgba(0, 0, 0, 0.28); }
@@ -163,7 +160,7 @@
             font-size: 180px;
             font-weight: bold;
             opacity: 0;
-            transition: opacity 0.5s ease, color 0.5s ease;
+            transition: opacity 0.5s ease;
             color: rgba(255, 255, 255, 0.35);
             pointer-events: none;
         }
@@ -173,21 +170,26 @@
         .sub-welcome {
             font-size: 45px; 
             font-weight: bold;
-            color: inherit;
+            color: rgba(255, 255, 255, 0.16); 
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease, color 0.5s ease;
             margin-top: 25px;
             pointer-events: none;
             white-space: pre-wrap;
         }
 
-        .wrapper:hover .big-name,
-        .wrapper:hover .big-desc {
+        body.dark-text .sub-welcome {
+            color: rgba(0, 0, 0, 0.16);
+        }
+
+        /* LOGICA DI VISIBILITA' */
+        .show-welcome .big-name,
+        .show-welcome .big-desc {
             opacity: 0;
         }
 
-        .wrapper:hover .welcome,
-        .wrapper:hover .sub-welcome {
+        .show-welcome .welcome,
+        .show-welcome .sub-welcome {
             opacity: 1;
         }
 
@@ -202,52 +204,24 @@
             z-index: 5;
         }
 
-        .contact-text {
-            opacity: 0.5;
-            transition: all 0.3s ease;
-            display: block;
-        }
-
-        .contact-links {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 5px;
-            opacity: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .contact-links a {
-            color: inherit;
-            text-decoration: none;
-            opacity: 0.8;
-        }
-
-        .contact-wrapper:hover .contact-text {
-            transform: translateY(-4px);
-            opacity: 0.9;
-        }
-
-        .contact-wrapper:hover .contact-links {
-            opacity: 1;
-            max-height: 500px;
-        }
+        .contact-text { opacity: 0.5; transition: all 0.3s ease; display: block; }
+        .contact-links { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.3s ease; }
+        .contact-links a { color: inherit; text-decoration: none; opacity: 0.8; }
+        .contact-wrapper:hover .contact-text { transform: translateY(-4px); opacity: 0.9; }
+        .contact-wrapper:hover .contact-links { opacity: 1; max-height: 500px; }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="wrapper">
-            <div class="big-text">
-                <div class="big-name">Tuana Aktas</div>
-                <div class="big-desc">I’m a visual communication student</div>
-                <div class="welcome">
-                    Welcome to my home
-                    <div class="sub-welcome" id="typewriter"></div>
-                </div>
+    <div class="container" id="main-container">
+        <div class="big-text">
+            <div class="big-name">Tuana Aktas</div>
+            <div class="big-desc">I’m a visual communication student</div>
+            
+            <div class="welcome">
+                Welcome to my home
+                <div class="sub-welcome" id="typewriter"></div>
             </div>
         </div>
     </div>
@@ -263,7 +237,7 @@
     </div>
 
     <div class="top">
-        <div>Exercise 1</div>
+        <div id="exercise-1" class="ex-trigger">What you will find</div>
         <div><a href="https://tuana-aktas.github.io/Homepage/giorno2/index.html">Exercise 2</a></div>
         <div><a href="https://tuana-aktas.github.io/Homepage/giorno3/index.html">Exercise 3</a></div>
         <div><a href="https://tuana-aktas.github.io/Homepage/giorno4/index.html">Exercise 4</a></div>
@@ -282,53 +256,39 @@
     <script>
         const colors = ["#0000ff", "#ff0000", "#ffff00"];
         let currentIndex = 0;
+        let arrowsTimer; // Variabile per gestire il timer
 
-        // SPARIZIONE DOPO 3 SECONDI
         const arrowsWrapper = document.getElementById('notification-arrows');
-        setTimeout(() => {
-            arrowsWrapper.classList.add('hidden');
-        }, 3000);
+        const ex1 = document.getElementById('exercise-1');
+        const mainContainer = document.getElementById('main-container');
+        const typewriterElement = document.getElementById('typewriter');
+        const typewriterText = "Here we can find selected works and experiments made with HTML";
+        
+        let charIndex = 0;
+        let isTyping = false;
 
         function updateTheme() {
             const currentColor = colors[currentIndex];
             document.body.style.backgroundColor = currentColor;
-
-            if (currentColor === "#ffff00") {
-                document.body.classList.add("dark-text");
-            } else {
-                document.body.classList.remove("dark-text");
-            }
+            document.body.classList.toggle("dark-text", currentColor === "#ffff00");
         }
 
         function changeColor(direction) {
-            if (direction === 'next') {
-                currentIndex = (currentIndex + 1) % colors.length;
-            } else {
-                currentIndex = (currentIndex - 1 + colors.length) % colors.length;
-            }
+            currentIndex = direction === 'next' ? (currentIndex + 1) % colors.length : (currentIndex - 1 + colors.length) % colors.length;
             updateTheme();
         }
 
         document.addEventListener("keydown", (event) => {
             const keyElement = document.getElementById(`key-${event.key}`);
             if (keyElement) keyElement.classList.add("active");
-
-            if (event.key === "ArrowRight") {
-                changeColor('next');
-            } else if (event.key === "ArrowLeft") {
-                changeColor('prev');
-            }
+            if (event.key === "ArrowRight") changeColor('next');
+            if (event.key === "ArrowLeft") changeColor('prev');
         });
 
         document.addEventListener("keyup", (event) => {
             const keyElement = document.getElementById(`key-${event.key}`);
             if (keyElement) keyElement.classList.remove("active");
         });
-
-        const typewriterElement = document.getElementById('typewriter');
-        const typewriterText = "Here we can find selected works and experiments made with HTML";
-        let charIndex = 0;
-        let isTyping = false;
 
         function typeWriter() {
             if (charIndex < typewriterText.length) {
@@ -340,14 +300,33 @@
             }
         }
 
-        const wrapper = document.querySelector('.wrapper');
-        wrapper.addEventListener('mouseenter', () => {
+        ex1.addEventListener('mouseenter', () => {
+            mainContainer.classList.add('show-welcome');
+            
+            // Mostra le frecce
+            arrowsWrapper.classList.add('visible');
+            
+            // Pulisce eventuali timer precedenti per sicurezza
+            clearTimeout(arrowsTimer);
+            
+            // Fa sparire le frecce dopo 6 secondi
+            arrowsTimer = setTimeout(() => {
+                arrowsWrapper.classList.remove('visible');
+            }, 6000);
+
             if (!isTyping) {
                 isTyping = true;
                 typewriterElement.textContent = "";
                 charIndex = 0;
                 typeWriter();
             }
+        });
+
+        ex1.addEventListener('mouseleave', () => {
+            mainContainer.classList.remove('show-welcome');
+            // Se il mouse esce, le frecce spariscono subito e annulliamo il timer
+            arrowsWrapper.classList.remove('visible');
+            clearTimeout(arrowsTimer);
         });
     </script>
 </body>
