@@ -1,25 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>G02E03: Disegno sinusoidale</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrivi e Trasforma - Lettere Grandi</title>
+    <style>
+        body {
+            background-color: blue;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            transition: background-color 0.4s ease;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+
+        input {
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.2);
+            color: white;
+            outline: none;
+            font-size: 18px;
+        }
+        
+        input::placeholder { color: rgba(255,255,255,0.6); }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .dot {
+            position: absolute;
+            width: 5px; /* Leggermente più grandi per riempire meglio */
+            height: 5px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-	<script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
-	<script>
-		function setup() {
-			createCanvas(700, 400)
-			background(200, 200, 200)
-		}
-		function draw() {
-			noStroke()
-			fill(mouseX, mouseY, 0)
-			let diametro = sin(frameCount * 0.05) * 127 + 128
-			ellipse(mouseX, mouseY, diametro, diametro)
-			ellipse(width-mouseX, mouseY, diametro, diametro)
-		}
 
-	</script>
+    <div id="ui">
+        <input type="text" id="userInput" placeholder="Scrivi qui..." maxlength="10">
+    </div>
+
+    <div id="container"></div>
+
+    <script>
+        const container = document.getElementById('container');
+        const input = document.getElementById('userInput');
+        const dots = [];
+        const MAX_DOTS = 1500; // Aumentato il numero di palline per lettere più grandi
+        const coloriPrimari = ['blue', 'red', 'yellow', 'white'];
+        let indiceSfondo = 0;
+        let indicePuntini = 3;
+
+        for (let i = 0; i < MAX_DOTS; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.opacity = "0";
+            dot.style.left = "50%";
+            dot.style.top = "50%";
+            container.appendChild(dot);
+            dots.push(dot);
+        }
+
+        function updateText(text) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            // Canvas più grande per lettere più definite
+            canvas.width = 1000;
+            canvas.height = 400;
+
+            ctx.fillStyle = "white";
+            // FONT MOLTO PIÙ GRANDE (180px invece di 120px)
+            ctx.font = "bold 220px Arial"; 
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(text.toUpperCase(), canvas.width / 2, canvas.height / 2);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            const points = [];
+
+            // Scansione pixel
+            for (let y = 0; y < canvas.height; y += 6) {
+                for (let x = 0; x < canvas.width; x += 6) {
+                    const index = (y * canvas.width + x) * 4;
+                    if (imageData[index + 3] > 128) {
+                        // Mappatura su scala più ampia dello schermo
+                        points.push({ 
+                            x: (x / canvas.width) * 90 - 45, 
+                            y: (y / canvas.height) * 80 - 40 
+                        });
+                    }
+                }
+            }
+
+            dots.forEach((dot, i) => {
+                if (i < points.length) {
+                    const p = points[i];
+                    dot.style.transform = `translate(${p.x}vw, ${p.y}vh)`;
+                    dot.style.opacity = "1";
+                } else {
+                    dot.style.opacity = "0";
+                    // Le palline extra si disperdono fuori campo
+                    if (dot.style.opacity === "1") {
+                        const randX = (Math.random()-0.5)*150;
+                        const randY = (Math.random()-0.5)*150;
+                        dot.style.transform = `translate(${randX}vw, ${randY}vh)`;
+                    }
+                }
+            });
+        }
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                updateText(input.value);
+                input.blur();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+                indiceSfondo = (indiceSfondo + 1) % coloriPrimari.length;
+                document.body.style.backgroundColor = coloriPrimari[indiceSfondo];
+            }
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                indicePuntini = (indicePuntini + 1) % coloriPrimari.length;
+                dots.forEach(dot => dot.style.backgroundColor = coloriPrimari[indicePuntini]);
+            }
+        });
+
+        // Click per esplosione
+        document.body.addEventListener('mousedown', (e) => {
+            if(e.target === input) return;
+            dots.forEach(dot => {
+                const randX = (Math.random() - 0.5) * 400;
+                const randY = (Math.random() - 0.5) * 400;
+                dot.style.transform += ` translate(${randX}px, ${randY}px)`;
+            });
+        });
+
+        document.body.addEventListener('mouseup', () => {
+            updateText(input.value || "Z");
+        });
+
+        updateText("Z");
+    </script>
 </body>
 </html>
