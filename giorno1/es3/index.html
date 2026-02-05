@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ilmiosito</title>
+    <title>ilmiosito | Tuana Aktas</title>
     <style>
         html, body {
             margin: 0;
@@ -20,7 +20,6 @@
             transition: background-color 0.6s ease, color 0.6s ease;
         }
 
-        /* CLASSE PER LO SFONDO GIALLO (TESTO NERO) */
         body.dark-text {
             color: black;
         }
@@ -43,13 +42,80 @@
 
         .top a {
             text-decoration: none;
-            color: inherit; /* Segue il colore del body */
+            color: inherit;
             cursor: pointer;
             transition: opacity 0.4s ease;
         }
 
         .top div:hover {
             opacity: 0.6;
+        }
+
+        /* 4 FRECCE E TESTO "CHANGE COLOR" - EFFETTO NOTIFICA */
+        .arrows-wrapper {
+            position: absolute;
+            bottom: 85px;
+            right: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .arrows-wrapper.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .arrows-container {
+            display: grid;
+            grid-template-columns: repeat(3, 30px);
+            grid-template-rows: repeat(2, 30px);
+            gap: 5px;
+        }
+
+        .change-color-label {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.4;
+        }
+
+        .arrow-key {
+            border: 1.5px solid currentColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .arrow-key.up { grid-column: 2; grid-row: 1; }
+        .arrow-key.left { grid-column: 1; grid-row: 2; }
+        .arrow-key.down { grid-column: 2; grid-row: 2; }
+        .arrow-key.right { grid-column: 3; grid-row: 2; }
+
+        .arrow-key:hover { opacity: 0.7; }
+        
+        .arrow-key.active {
+            opacity: 1;
+            background-color: white;
+            color: #0000ff;
+        }
+
+        body.dark-text .arrow-key.active {
+            background-color: black;
+            color: #ffff00;
         }
 
         /* CENTER CONTAINER */
@@ -67,7 +133,6 @@
             cursor: pointer;
         }
 
-        /* BIG TEXT STYLES */
         .big-text {
             text-align: left;
             line-height: 1.05;
@@ -88,7 +153,6 @@
             transition: opacity 0.5s ease, color 0.5s ease;
         }
 
-        /* Adattamento colori grandi per sfondo giallo */
         body.dark-text .big-name { color: rgba(0, 0, 0, 0.28); }
         body.dark-text .big-desc { color: rgba(0, 0, 0, 0.16); }
 
@@ -188,9 +252,19 @@
         </div>
     </div>
 
+    <div class="arrows-wrapper" id="notification-arrows">
+        <div class="arrows-container">
+            <div class="arrow-key up" id="key-ArrowUp">↑</div>
+            <div class="arrow-key left" id="key-ArrowLeft" onclick="changeColor('prev')">←</div>
+            <div class="arrow-key down" id="key-ArrowDown">↓</div>
+            <div class="arrow-key right" id="key-ArrowRight" onclick="changeColor('next')">→</div>
+        </div>
+        <div class="change-color-label">Change color</div>
+    </div>
+
     <div class="top">
         <div>Exercise 1</div>
-        <div><a href=https://tuana-aktas.github.io/Homepage/giorno2/index.html>Exercise 2</a></div>
+        <div><a href="https://tuana-aktas.github.io/Homepage/giorno2/index.html">Exercise 2</a></div>
         <div><a href="https://tuana-aktas.github.io/Homepage/giorno3/index.html">Exercise 3</a></div>
         <div><a href="https://tuana-aktas.github.io/Homepage/giorno4/index.html">Exercise 4</a></div>
     </div>
@@ -206,15 +280,19 @@
     </div>
 
     <script>
-        /* CAMBIO COLORE SFONDO E LOGICA TESTO */
         const colors = ["#0000ff", "#ff0000", "#ffff00"];
         let currentIndex = 0;
+
+        // SPARIZIONE DOPO 3 SECONDI
+        const arrowsWrapper = document.getElementById('notification-arrows');
+        setTimeout(() => {
+            arrowsWrapper.classList.add('hidden');
+        }, 3000);
 
         function updateTheme() {
             const currentColor = colors[currentIndex];
             document.body.style.backgroundColor = currentColor;
 
-            // Se il colore è giallo (#ffff00), il testo diventa nero
             if (currentColor === "#ffff00") {
                 document.body.classList.add("dark-text");
             } else {
@@ -222,17 +300,31 @@
             }
         }
 
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowRight") {
+        function changeColor(direction) {
+            if (direction === 'next') {
                 currentIndex = (currentIndex + 1) % colors.length;
-                updateTheme();
-            } else if (event.key === "ArrowLeft") {
+            } else {
                 currentIndex = (currentIndex - 1 + colors.length) % colors.length;
-                updateTheme();
+            }
+            updateTheme();
+        }
+
+        document.addEventListener("keydown", (event) => {
+            const keyElement = document.getElementById(`key-${event.key}`);
+            if (keyElement) keyElement.classList.add("active");
+
+            if (event.key === "ArrowRight") {
+                changeColor('next');
+            } else if (event.key === "ArrowLeft") {
+                changeColor('prev');
             }
         });
 
-        /* EFFETTO MACCHINA DA SCRIVERE */
+        document.addEventListener("keyup", (event) => {
+            const keyElement = document.getElementById(`key-${event.key}`);
+            if (keyElement) keyElement.classList.remove("active");
+        });
+
         const typewriterElement = document.getElementById('typewriter');
         const typewriterText = "Here we can find selected works and experiments made with HTML";
         let charIndex = 0;
