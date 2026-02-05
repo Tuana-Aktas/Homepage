@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ilmiosito | Tuana Aktas</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            position: relative;
+            background-color: #0000ff;
+            font-family: Helvetica, Arial, sans-serif;
+            color: white;
+            transition: background-color 0.6s ease, color 0.6s ease;
+        }
+
+        body.dark-text {
+            color: black;
+        }
+
+        /* TOP RIGHT BLOCK (EXERCISES) */
+        .top {
+            display: flex;
+            justify-content: flex-end;
+            gap: 60px;
+            padding-bottom: 25px;
+            padding-right: 60px;
+            font-weight: bold;
+            font-size: 25px;
+            letter-spacing: 1px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        .top a {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: opacity 0.4s ease;
+        }
+
+        .top div:hover {
+            opacity: 0.6;
+        }
+
+        /* 4 FRECCE E TESTO "CHANGE COLOR" - EFFETTO NOTIFICA */
+        .arrows-wrapper {
+            position: absolute;
+            bottom: 85px;
+            right: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .arrows-wrapper.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .arrows-container {
+            display: grid;
+            grid-template-columns: repeat(3, 30px);
+            grid-template-rows: repeat(2, 30px);
+            gap: 5px;
+        }
+
+        .change-color-label {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.4;
+        }
+
+        .arrow-key {
+            border: 1.5px solid currentColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .arrow-key.up { grid-column: 2; grid-row: 1; }
+        .arrow-key.left { grid-column: 1; grid-row: 2; }
+        .arrow-key.down { grid-column: 2; grid-row: 2; }
+        .arrow-key.right { grid-column: 3; grid-row: 2; }
+
+        .arrow-key:hover { opacity: 0.7; }
+        
+        .arrow-key.active {
+            opacity: 1;
+            background-color: white;
+            color: #0000ff;
+        }
+
+        body.dark-text .arrow-key.active {
+            background-color: black;
+            color: #ffff00;
+        }
+
+        /* CENTER CONTAINER */
+        .container {
+            height: calc(100% - 140px);
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wrapper {
+            cursor: pointer;
+        }
+
+        .big-text {
+            text-align: left;
+            line-height: 1.05;
+            position: relative;
+        }
+
+        .big-name {
+            font-size: 180px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.28);
+            transition: opacity 0.5s ease, color 0.5s ease;
+        }
+
+        .big-desc {
+            font-size: 150px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.16);
+            transition: opacity 0.5s ease, color 0.5s ease;
+        }
+
+        body.dark-text .big-name { color: rgba(0, 0, 0, 0.28); }
+        body.dark-text .big-desc { color: rgba(0, 0, 0, 0.16); }
+
+        .welcome {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 180px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease, color 0.5s ease;
+            color: rgba(255, 255, 255, 0.35);
+            pointer-events: none;
+        }
+
+        body.dark-text .welcome { color: rgba(0, 0, 0, 0.35); }
+
+        .sub-welcome {
+            font-size: 45px; 
+            font-weight: bold;
+            color: inherit;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            margin-top: 25px;
+            pointer-events: none;
+            white-space: pre-wrap;
+        }
+
+        .wrapper:hover .big-name,
+        .wrapper:hover .big-desc {
+            opacity: 0;
+        }
+
+        .wrapper:hover .welcome,
+        .wrapper:hover .sub-welcome {
+            opacity: 1;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: left;
+            padding-left: 60px;
+            font-size: 14px;
+            z-index: 5;
+        }
+
+        .contact-text {
+            opacity: 0.5;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 5px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .contact-links a {
+            color: inherit;
+            text-decoration: none;
+            opacity: 0.8;
+        }
+
+        .contact-wrapper:hover .contact-text {
+            transform: translateY(-4px);
+            opacity: 0.9;
+        }
+
+        .contact-wrapper:hover .contact-links {
+            opacity: 1;
+            max-height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="wrapper">
+            <div class="big-text">
+                <div class="big-name">Tuana Aktas</div>
+                <div class="big-desc">I’m a visual communication student</div>
+                <div class="welcome">
+                    Welcome to my home
+                    <div class="sub-welcome" id="typewriter"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="arrows-wrapper" id="notification-arrows">
+        <div class="arrows-container">
+            <div class="arrow-key up" id="key-ArrowUp">↑</div>
+            <div class="arrow-key left" id="key-ArrowLeft" onclick="changeColor('prev')">←</div>
+            <div class="arrow-key down" id="key-ArrowDown">↓</div>
+            <div class="arrow-key right" id="key-ArrowRight" onclick="changeColor('next')">→</div>
+        </div>
+        <div class="change-color-label">Change color</div>
+    </div>
+
+    <div class="top">
+        <div>Exercise 1</div>
+        <div><a href="https://tuana-aktas.github.io/Homepage/giorno2/index.html">Exercise 2</a></div>
+        <div><a href="https://tuana-aktas.github.io/Homepage/giorno3/index.html">Exercise 3</a></div>
+        <div><a href="https://tuana-aktas.github.io/Homepage/giorno4/index.html">Exercise 4</a></div>
+    </div>
+
+    <div class="footer">
+        <div class="contact-wrapper">
+            <span class="contact-text">How to contact me</span>
+            <div class="contact-links">
+                <a href="https://example-link.com" target="_blank">Website</a>
+                <a href="mailto:example@example.com">Email</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const colors = ["#0000ff", "#ff0000", "#ffff00"];
+        let currentIndex = 0;
+
+        // SPARIZIONE DOPO 3 SECONDI
+        const arrowsWrapper = document.getElementById('notification-arrows');
+        setTimeout(() => {
+            arrowsWrapper.classList.add('hidden');
+        }, 3000);
+
+        function updateTheme() {
+            const currentColor = colors[currentIndex];
+            document.body.style.backgroundColor = currentColor;
+
+            if (currentColor === "#ffff00") {
+                document.body.classList.add("dark-text");
+            } else {
+                document.body.classList.remove("dark-text");
+            }
+        }
+
+        function changeColor(direction) {
+            if (direction === 'next') {
+                currentIndex = (currentIndex + 1) % colors.length;
+            } else {
+                currentIndex = (currentIndex - 1 + colors.length) % colors.length;
+            }
+            updateTheme();
+        }
+
+        document.addEventListener("keydown", (event) => {
+            const keyElement = document.getElementById(`key-${event.key}`);
+            if (keyElement) keyElement.classList.add("active");
+
+            if (event.key === "ArrowRight") {
+                changeColor('next');
+            } else if (event.key === "ArrowLeft") {
+                changeColor('prev');
+            }
+        });
+
+        document.addEventListener("keyup", (event) => {
+            const keyElement = document.getElementById(`key-${event.key}`);
+            if (keyElement) keyElement.classList.remove("active");
+        });
+
+        const typewriterElement = document.getElementById('typewriter');
+        const typewriterText = "Here we can find selected works and experiments made with HTML";
+        let charIndex = 0;
+        let isTyping = false;
+
+        function typeWriter() {
+            if (charIndex < typewriterText.length) {
+                typewriterElement.textContent += typewriterText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 60);
+            } else {
+                isTyping = false;
+            }
+        }
+
+        const wrapper = document.querySelector('.wrapper');
+        wrapper.addEventListener('mouseenter', () => {
+            if (!isTyping) {
+                isTyping = true;
+                typewriterElement.textContent = "";
+                charIndex = 0;
+                typeWriter();
+            }
+        });
+    </script>
+</body>
+</html>
