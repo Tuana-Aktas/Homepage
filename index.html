@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ilmiosito | Tuana Aktas</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            position: relative;
+            background-color: #0000ff;
+            font-family: Helvetica, Arial, sans-serif;
+            color: white;
+            transition: background-color 0.6s ease, color 0.6s ease;
+        }
+
+        body.dark-text {
+            color: black;
+        }
+
+        /* TOP RIGHT BLOCK */
+        .top {
+            display: flex;
+            justify-content: flex-end;
+            gap: 60px;
+            padding-bottom: 25px;
+            padding-right: 60px;
+            font-weight: bold;
+            font-size: 25px;
+            letter-spacing: 1px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        .top a, .ex-trigger {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: opacity 0.4s ease;
+        }
+
+        .top div:hover {
+            opacity: 0.6;
+        }
+
+        /* ARROW NOTIFICATION */
+        .arrows-wrapper {
+            position: absolute;
+            bottom: 85px;
+            right: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .arrows-wrapper.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .arrows-container {
+            display: grid;
+            grid-template-columns: repeat(3, 30px);
+            grid-template-rows: repeat(2, 30px);
+            gap: 5px;
+        }
+
+        .change-color-label {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.4;
+        }
+
+        .arrow-key {
+            border: 1.5px solid currentColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .arrow-key.up { grid-column: 2; grid-row: 1; }
+        .arrow-key.left { grid-column: 1; grid-row: 2; }
+        .arrow-key.down { grid-column: 2; grid-row: 2; }
+        .arrow-key.right { grid-column: 3; grid-row: 2; }
+
+        .arrow-key:hover { opacity: 0.7; }
+        
+        .arrow-key.active {
+            opacity: 1;
+            background-color: white;
+            color: #0000ff;
+        }
+
+        body.dark-text .arrow-key.active {
+            background-color: black;
+            color: #ffff00;
+        }
+
+        /* CENTER CONTAINER */
+        .container {
+            height: calc(100% - 140px);
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .big-text {
+            text-align: left;
+            line-height: 1.05;
+            position: relative;
+            display: inline-block;
+        }
+
+        .big-name {
+            font-size: 180px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.28);
+            transition: opacity 0.5s ease;
+        }
+
+        .big-desc {
+            font-size: 150px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.16);
+            transition: opacity 0.5s ease;
+        }
+
+        body.dark-text .big-name { color: rgba(0, 0, 0, 0.28); }
+        body.dark-text .big-desc { color: rgba(0, 0, 0, 0.16); }
+
+        .welcome {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 180px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            color: rgba(255, 255, 255, 0.35);
+            pointer-events: none;
+        }
+
+        body.dark-text .welcome { color: rgba(0, 0, 0, 0.35); }
+
+        .sub-welcome {
+            font-size: 45px; 
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.16); 
+            opacity: 0;
+            transition: opacity 0.5s ease, color 0.5s ease;
+            margin-top: 25px;
+            pointer-events: none;
+            white-space: pre-wrap;
+        }
+
+        body.dark-text .sub-welcome {
+            color: rgba(0, 0, 0, 0.16);
+        }
+
+        /* LOGICA DI VISIBILITA' */
+        .show-welcome .big-name,
+        .show-welcome .big-desc {
+            opacity: 0;
+        }
+
+        .show-welcome .welcome,
+        .show-welcome .sub-welcome {
+            opacity: 1;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: left;
+            padding-left: 60px;
+            font-size: 14px;
+            z-index: 5;
+        }
+
+        .contact-text { opacity: 0.5; transition: all 0.3s ease; display: block; }
+        .contact-links { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.3s ease; }
+        .contact-links a { color: inherit; text-decoration: none; opacity: 0.8; }
+        .contact-wrapper:hover .contact-text { transform: translateY(-4px); opacity: 0.9; }
+        .contact-wrapper:hover .contact-links { opacity: 1; max-height: 500px; }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="main-container">
+        <div class="big-text">
+            <div class="big-name">Tuana Aktas</div>
+            <div class="big-desc">I’m a visual communication student</div>
+            
+            <div class="welcome">
+                Welcome to my home
+                <div class="sub-welcome" id="typewriter"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="arrows-wrapper" id="notification-arrows">
+        <div class="arrows-container">
+            <div class="arrow-key up" id="key-ArrowUp">↑</div>
+            <div class="arrow-key left" id="key-ArrowLeft" onclick="changeColor('prev')">←</div>
+            <div class="arrow-key down" id="key-ArrowDown">↓</div>
+            <div class="arrow-key right" id="key-ArrowRight" onclick="changeColor('next')">→</div>
+        </div>
+        <div class="change-color-label">Change color</div>
+    </div>
+
+    <div class="top">
+        <div id="exercise-1" class="ex-trigger">What you will find</div>
+        <div><a href="https://tuana-aktas.github.io/Homepage/giorno2/index.html">Exercise 2</a></div>
+        <div><a href="https://tuana-aktas.github.io/Homepage/giorno3/index.html">Exercise 3</a></div>
+        <div><a href="https://tuana-aktas.github.io/Homepage/giorno4/index.html">Exercise 4</a></div>
+    </div>
+
+    <div class="footer">
+        <div class="contact-wrapper">
+            <span class="contact-text">How to contact me</span>
+            <div class="contact-links">
+                <a href="https://example-link.com" target="_blank">Website</a>
+                <a href="mailto:example@example.com">Email</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const colors = ["#0000ff", "#ff0000", "#ffff00"];
+        let currentIndex = 0;
+        let arrowsTimer; // Variabile per gestire il timer
+
+        const arrowsWrapper = document.getElementById('notification-arrows');
+        const ex1 = document.getElementById('exercise-1');
+        const mainContainer = document.getElementById('main-container');
+        const typewriterElement = document.getElementById('typewriter');
+        const typewriterText = "Here we can find selected works and experiments made with HTML";
+        
+        let charIndex = 0;
+        let isTyping = false;
+
+        function updateTheme() {
+            const currentColor = colors[currentIndex];
+            document.body.style.backgroundColor = currentColor;
+            document.body.classList.toggle("dark-text", currentColor === "#ffff00");
+        }
+
+        function changeColor(direction) {
+            currentIndex = direction === 'next' ? (currentIndex + 1) % colors.length : (currentIndex - 1 + colors.length) % colors.length;
+            updateTheme();
+        }
+
+        document.addEventListener("keydown", (event) => {
+            const keyElement = document.getElementById(`key-${event.key}`);
+            if (keyElement) keyElement.classList.add("active");
+            if (event.key === "ArrowRight") changeColor('next');
+            if (event.key === "ArrowLeft") changeColor('prev');
+        });
+
+        document.addEventListener("keyup", (event) => {
+            const keyElement = document.getElementById(`key-${event.key}`);
+            if (keyElement) keyElement.classList.remove("active");
+        });
+
+        function typeWriter() {
+            if (charIndex < typewriterText.length) {
+                typewriterElement.textContent += typewriterText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 60);
+            } else {
+                isTyping = false;
+            }
+        }
+
+        ex1.addEventListener('mouseenter', () => {
+            mainContainer.classList.add('show-welcome');
+            
+            // Mostra le frecce
+            arrowsWrapper.classList.add('visible');
+            
+            // Pulisce eventuali timer precedenti per sicurezza
+            clearTimeout(arrowsTimer);
+            
+            // Fa sparire le frecce dopo 6 secondi
+            arrowsTimer = setTimeout(() => {
+                arrowsWrapper.classList.remove('visible');
+            }, 6000);
+
+            if (!isTyping) {
+                isTyping = true;
+                typewriterElement.textContent = "";
+                charIndex = 0;
+                typeWriter();
+            }
+        });
+
+        ex1.addEventListener('mouseleave', () => {
+            mainContainer.classList.remove('show-welcome');
+            // Se il mouse esce, le frecce spariscono subito e annulliamo il timer
+            arrowsWrapper.classList.remove('visible');
+            clearTimeout(arrowsTimer);
+        });
+    </script>
+</body>
+</html>
